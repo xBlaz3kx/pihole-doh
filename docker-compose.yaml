@@ -1,0 +1,26 @@
+version: "3.7"
+services:
+  pihole:
+    container_name: "pihole"
+    build: ./
+    hostname: 'pihole'
+    labels:
+      #- "traefik.enable=true"
+      - "traefik.http.routers.pihole.rule=Host(`${DOMAIN_NAME}.com`)"
+      - "traefik.http.routers.pihole.entrypoints=web"
+      - "traefik.http.services.pihole.loadbalancer.server.port=80"
+      - "traefik.docker.network=home"
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+      - "5443:443/tcp"
+    environment:
+      TZ: 'Europe/Ljubljana'
+      WEBPASSWORD: 'pass'
+    volumes:
+      - './etc-pihole/:/etc/pihole/'
+      - './etc-dnsmasq.d/:/etc/dnsmasq.d/'
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped
